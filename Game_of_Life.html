@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Game of Life</title>
+</head>
+<body>
+	<h1>HTML5 Canvas - Draw a Rectangle</h1>
+
+	<canvas id="myCanvas" width="400" height="400" style="border: 1px solid black;">	
+		Sorry, your browser does not support canvas.
+	</canvas>
+
+	<script>
+		const canvas = document.getElementById("myCanvas");
+		const ctx = canvas.getContext("2d");
+		let cellSize = 20;
+		let fieldSize = 20;
+		let currentField = new Array(fieldSize);
+		let nextField = new Array(fieldSize);
+
+		let canvasRect = canvas.getBoundingClientRect();
+		
+		for (let i = 0; i < fieldSize; i++){									
+			nextField[i] = new Array(fieldSize);
+			currentField[i] = new Array(fieldSize);
+		}
+
+		function init(){
+			/*for (let i = 0; i < fieldSize; i++){
+				for (let j = 0; j < fieldSize; j++){
+					if (Math.random() > 0.7){
+						currentField[i][j] = 1;
+					}
+					else{
+						currentField[i][j] = 0;
+					}
+				}
+			}*/
+			function handleCanvasClick(event) {											//функция клика
+    			let x = Math.floor((event.clientX - canvasRect.left) / cellSize);		//вычисление координат с осей ординат
+    			let y = Math.floor((event.clientY - canvasRect.top) / cellSize);		//вычисление координат с осей абсцисс
+    			currentField[y][x] = 1;
+    			draw();
+			}
+			canvas.addEventListener("click", handleCanvasClick);		// добавление слушателя события клика к холсту с использованием именованной функции
+		}
+		init();
+
+		function neighborCount(r,c){					//подсчёт соседей
+			let sum = 0;
+			for (let i = -1; i <= 1; i++){
+				for (let j = -1; j <= 1; j++){
+					sum += currentField[(r + i + fieldSize)%fieldSize][(c + j + fieldSize)%fieldSize];	//позволяет получить значение клетки с учетом зацикленности поля.
+				}
+			}
+			sum -= currentField[r][c];
+			//console.log(sum);
+			return sum;
+		}
+
+		function makeStep(){
+			for (let i = 0; i < fieldSize; i++){
+				for (let j = 0; j < fieldSize; j++){
+					let nbs = neighborCount(i, j);
+					if (((currentField[i][j] === 0) && (nbs === 3)) || ((currentField[i][j] === 1) && ((nbs === 2) || (nbs === 3)))){
+						nextField[i][j] = 1;
+					}
+					else {
+						nextField[i][j] = 0;
+					}
+					
+				}
+			}
+			for (let i = 0; i<fieldSize; i++){
+				for (let j = 0; j<fieldSize; j++){
+					currentField[i][j] = nextField[i][j];
+				}
+			}
+		}
+		function draw(){
+			for (let i = 0; i < fieldSize; i++){
+				for (let j = 0; j < fieldSize; j++){
+					if (currentField[i][j] === 0){
+						ctx.fillStyle = "burlywood";
+					}
+					else{
+						ctx.fillStyle = "aquamarine";
+					}
+					ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);	//этот метод рисует прямоугольник на холсте с заданными координатами левого верхнего угла, шириной и высотой
+				}
+			}
+		}
+		function go(){
+			makeStep();
+			draw();
+		}
+		draw();
+		init();
+		makeStep();
+		let tm = setInterval(go, 3000);
+	</script>
+</body>
+</html>
