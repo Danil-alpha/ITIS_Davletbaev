@@ -1,0 +1,12 @@
+jin 100
+set 101 1
+set 102 1
+set 103 2
+set 104 1
+cmpjmp 100 103 36 19
+subik 102 103 102
+add 103 101 103
+add 104 101 104
+cmpjmp 104 100 19 36
+jout 102
+exit
